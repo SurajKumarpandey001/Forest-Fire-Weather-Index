@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Weather Index - FWI Prediction System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Video background styling */
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 200, 255, 0.3) 0%, transparent 50%);
+            animation: float 8s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+
+        .container {
+            text-align: center;
+            z-index: 1;
+            position: relative;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .hero-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 60px 40px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideUp 1.2s ease-out;
+            margin-bottom: 30px;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: pulse 3s infinite;
+            filter: drop-shadow(0 0 20px rgba(255, 107, 107, 0.5));
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #fff, #ffda79);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 40px;
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .feature-text {
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24, #ff9f43);
+            color: white;
+            text-decoration: none;
+            padding: 20px 50px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.4s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .cta-button:hover:before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(45deg, #ff5252, #d84315, #ff8f00);
+        }
+
+        .info-section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+        }
+
+        .info-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .info-text {
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffda79;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background video -->
+    <video autoplay muted loop id="bg-video">
+        <source src="https://cdn.pixabay.com/video/2019/11/06/28746-371345147_large.mp4" type="video/mp4">
+    </video>
+
+    <!-- Overlay patterns -->
+    <div class="background-pattern"></div>
+    
+    <div class="container">
+        <div class="hero-section">
+            <div class="logo">🔥</div>
+            <h1>Fire Weather Index</h1>
+            <p class="subtitle">Advanced Prediction System for Fire Weather Risk Assessment</p>
+            
+            <a href="{{ url_for('predict_datapoint') }}" class="cta-button">Start Prediction</a>
+
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-number">9</span>
+                    <div class="stat-label">Parameters</div>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">AI</span>
+                    <div class="stat-label">Powered</div>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">24/7</span>
+                    <div class="stat-label">Available</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <div class="info-title">🔬 About Fire Weather Index System</div>
+            <p class="info-text">
+                The Fire Weather Index (FWI) System is a comprehensive meteorological tool designed to assess fire danger based on weather conditions. 
+                Our advanced machine learning model analyzes nine critical parameters including temperature, relative humidity, wind speed, rainfall, 
+                and specialized fire weather codes (FFMC, DMC, ISI) to provide accurate fire weather risk predictions for different geographical regions.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

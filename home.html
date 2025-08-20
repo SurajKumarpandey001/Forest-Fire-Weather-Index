@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FWI Prediction</title>
+  <style>
+    /* Reset margin/padding and ensure full viewport coverage */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    /* Full-screen video background styling */
+    .video-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1; /* Behind content */
+      filter: brightness(0.6); /* Darken for readability */
+    }
+
+    /* Main container styling on top of video */
+    .container {
+      position: relative;
+      z-index: 1;
+      min-height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 900px;
+      width: 100%;
+      color: #fff;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2em;
+      margin-bottom: 25px;
+      text-shadow: 0 0 8px rgba(0,0,0,0.6);
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.9em;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    label span {
+      font-size: 1.2em;
+    }
+
+    input {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+button {
+  grid-column: 1 / -1; /* make the button span all columns */
+  justify-self: center; /* center within the grid cell */
+  padding: 15px 30px;
+  background: linear-gradient(90deg, #ff9800, #f44336);
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1em;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(244, 67, 54, 0.5);
+}
+
+
+.result-card {
+  margin-top: 25px;
+  padding: 20px;
+  background: linear-gradient(90deg, #1d976c, #93f9b9); /* professional green blend */
+  border-radius: 10px;
+  text-align: center; /* center all content */
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.result-card strong {
+  color: #ffeb3b; /* bright yellow for value emphasis */
+}
+
+    .result-card span {
+      font-size: 2em;
+    }
+  </style>
+</head>
+<body>
+  <!-- Video Background -->
+  <video class="video-bg" autoplay muted loop playsinline>
+    <source src="https://cdn.pixabay.com/video/2019/11/06/28746-371345147_large.mp4" type="video/mp4">
+    <!-- Optional fallback -->
+    Your browser doesn’t support the video tag.
+  </video>
+
+  <!-- Form Overlay -->
+  <div class="container">
+    <div class="card">
+      <h1>🔥 Fire Weather Index Prediction</h1>
+      <form action="{{ url_for('predict_datapoint') }}" method="post">
+        <div class="input-group">
+          <label><span>🌡️</span> Temperature (°C)</label>
+          <input type="text" name="Temperature" placeholder="e.g., 25.5" required>
+        </div>
+        <div class="input-group">
+          <label><span>💧</span> Relative Humidity (%)</label>
+          <input type="text" name="RH" placeholder="e.g., 60.2" required>
+        </div>
+        <div class="input-group">
+          <label><span>🌬️</span> Wind Speed (km/h)</label>
+          <input type="text" name="Ws" placeholder="e.g., 15.3" required>
+        </div>
+        <div class="input-group">
+          <label><span>🌧️</span> Rainfall (mm)</label>
+          <input type="text" name="Rain" placeholder="e.g., 2.1" required>
+        </div>
+        <div class="input-group">
+          <label><span>🔥</span> Fine Fuel Moisture Code</label>
+          <input type="text" name="FFMC" placeholder="e.g., 85.4" required>
+        </div>
+        <div class="input-group">
+          <label><span>🍃</span> Duff Moisture Code</label>
+          <input type="text" name="DMC" placeholder="e.g., 45.2" required>
+        </div>
+        <div class="input-group">
+          <label><span>⚡</span> Initial Spread Index</label>
+          <input type="text" name="ISI" placeholder="e.g., 8.5" required>
+        </div>
+        <div class="input-group">
+          <label><span>📊</span> Fire Danger Class</label>
+          <input type="text" name="Classes" placeholder="e.g., 3" required>
+        </div>
+        <div class="input-group">
+          <label><span>🗺️</span> Region Code</label>
+          <input type="text" name="Region" placeholder="e.g., 1" required>
+        </div>
+
+        <button type="submit">🔍 Predict Fire Weather Index</button>
+      </form>
+
+      
+      <div class="result-card">
+        <span>🔥</span>
+        Fire Weather Index Prediction: <strong>{{ results }}</strong>
+      </div>
+      
+    </div>
+  </div>
+</body>
+</html>
