@@ -45,7 +45,7 @@ Web Application – A Flask app collects user inputs, processes them, and displa
 **🛠 Installation & Setup**
 
 1️⃣ Clone the Repository
-git clone https://github.com/AshutoshKumar18/fire-weather-index-prediction.git
+git clone https://github.com/SurajKumarpandey001/Forest-Fire-Weather-Index.git
 cd fire-weather-index-prediction
 
 2️⃣ Create a Virtual Environment & Activate
@@ -93,4 +93,5 @@ Jupyter Notebook 📓
 Contributions, issues, and feature requests are welcome!
 
 Feel free to use this repository and submit a pull request.
+
 
